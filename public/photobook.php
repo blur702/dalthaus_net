@@ -55,6 +55,7 @@ if (!$pageInfo) {
 
 // Set page title
 $pageTitle = $photobook['title'];
+$bodyClass = 'photobook-page';
 
 // Additional styles for photobook viewer
 $additionalStyles = '

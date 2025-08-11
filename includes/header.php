@@ -50,7 +50,7 @@ if (!isset($pageTitle)) {
     <?= $additionalStyles ?>
     <?php endif; ?>
 </head>
-<body>
+<body<?php if (!empty($bodyClass)): ?> class="<?= htmlspecialchars($bodyClass) ?>"<?php endif; ?>>
     <div class="page-wrapper">
         <!-- Header with site title and hamburger menu -->
         <header class="site-header" <?php if (!empty($settings['header_image'])): ?>

@@ -368,6 +368,11 @@ img.article-thumbnail {
     margin: 0 auto;
 }
 
+/* Photobook specific container override */
+.photobook-page .article-content {
+    max-width: 1200px;
+}
+
 .article-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
