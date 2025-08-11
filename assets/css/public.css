@@ -167,11 +167,18 @@ h1, h2, h3, h4, h5, h6 {
     padding: 2rem 20px;
 }
 
+/* Main content area with padding */
+.site-main {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
 /* Container for consistent width across all pages */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
+    padding: 0 20px;
 }
 
 .content-layout {
@@ -377,10 +384,24 @@ img.article-thumbnail {
 
 /* Articles and photobooks use full container width */
 
+.article-wrapper {
+    padding-top: 1rem;
+}
+
 .article-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #e0e0e0;
+}
+
+/* Article title matches photobook styling */
+.article-header h1 {
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+    font-family: 'Arimo', sans-serif;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1.2;
 }
 
 /* Article page specific meta */
@@ -407,6 +428,7 @@ img.article-thumbnail {
 .photobook-viewer {
     max-width: 800px;
     margin: 0 auto;
+    padding-top: 1rem;
 }
 
 .book-header {
