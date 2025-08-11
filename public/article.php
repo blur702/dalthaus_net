@@ -365,31 +365,26 @@ $additionalScripts = '
         if (currentPage <= 4) {
             // Show first 5 pages + last
             for (let i = 1; i <= Math.min(5, totalPages - 1); i++) {
-                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
-                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+                html += \'<button class="page-number \' + (i === currentPage ? \'active\' : \'\') + \'" onclick="goToPage(\' + i + \')" data-page="\' + i + \'">\' + i + \'</button>\';
             }
-            if (totalPages > 6) html += '<span class="page-ellipsis">...</span>';
-            html += `<button class="page-number ${currentPage === totalPages ? 'active' : ''}" 
-                     onclick="goToPage(${totalPages})" data-page="${totalPages}">${totalPages}</button>`;
+            if (totalPages > 6) html += \'<span class="page-ellipsis">...</span>\';
+            html += \'<button class="page-number \' + (currentPage === totalPages ? \'active\' : \'\') + \'" onclick="goToPage(\' + totalPages + \')" data-page="\' + totalPages + \'">\' + totalPages + \'</button>\';
         } else if (currentPage >= totalPages - 3) {
             // Show first + last 5 pages
-            html += '<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>';
-            html += '<span class="page-ellipsis">...</span>';
+            html += \'<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>\';
+            html += \'<span class="page-ellipsis">...</span>\';
             for (let i = totalPages - 4; i <= totalPages; i++) {
-                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
-                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+                html += \'<button class="page-number \' + (i === currentPage ? \'active\' : \'\') + \'" onclick="goToPage(\' + i + \')" data-page="\' + i + \'">\' + i + \'</button>\';
             }
         } else {
             // Show first + current-1, current, current+1 + last
-            html += '<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>';
-            html += '<span class="page-ellipsis">...</span>';
+            html += \'<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>\';
+            html += \'<span class="page-ellipsis">...</span>\';
             for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
-                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+                html += \'<button class="page-number \' + (i === currentPage ? \'active\' : \'\') + \'" onclick="goToPage(\' + i + \')" data-page="\' + i + \'">\' + i + \'</button>\';
             }
-            html += '<span class="page-ellipsis">...</span>';
-            html += `<button class="page-number" onclick="goToPage(${totalPages})" 
-                     data-page="${totalPages}">${totalPages}</button>`;
+            html += \'<span class="page-ellipsis">...</span>\';
+            html += \'<button class="page-number" onclick="goToPage(\' + totalPages + \')" data-page="\' + totalPages + \'">\' + totalPages + \'</button>\';
         }
         
         container.innerHTML = html;
