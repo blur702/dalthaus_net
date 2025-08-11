@@ -137,8 +137,30 @@ require_once __DIR__ . '/../includes/header.php';
                 </header>
                 
                 <?php if ($totalPages > 1): ?>
-                <nav class="page-navigation" aria-label="Page navigation">
-                    <button class="page-nav-arrow" id="prev-btn" onclick="navigatePage(-1)" aria-label="Previous page" disabled>
+                <div class="article-top-nav">
+                    <select id="page-selector" onchange="goToPage(this.value)" class="page-selector-elegant">
+                        <?php if ($pageInfo && isset($pageInfo['pages'])): ?>
+                            <?php foreach ($pageInfo['pages'] as $page): ?>
+                                <option value="<?= $page['page'] ?>">
+                                    <?= $page['page'] ?>. <?= htmlspecialchars($page['title']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
+                                <option value="<?= $i ?>">Page <?= $i ?> of <?= $totalPages ?></option>
+                            <?php endfor; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+                
+                <article id="photobook-content" class="book-content" role="main" aria-live="polite">
+                    <!-- Story pages will be loaded here -->
+                </article>
+                
+                <?php if ($totalPages > 1): ?>
+                <nav class="page-navigation bottom-nav" aria-label="Page navigation">
+                    <button class="page-nav-arrow" id="prev-btn-bottom" onclick="navigatePage(-1)" aria-label="Previous page">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M15 18l-6-6 6-6"/>
                         </svg>
@@ -152,10 +174,7 @@ require_once __DIR__ . '/../includes/header.php';
                             for($i = 1; $i <= $totalPages; $i++): ?>
                                 <button class="page-number <?= $i === 1 ? 'active' : '' ?>" 
                                         onclick="goToPage(<?= $i ?>)" 
-                                        data-page="<?= $i ?>"
-                                        <?php if ($pageInfo && isset($pageInfo['pages'][$i-1])): ?>
-                                        title="<?= htmlspecialchars($pageInfo['pages'][$i-1]['title']) ?>"
-                                        <?php endif; ?>>
+                                        data-page="<?= $i ?>">
                                     <?= $i ?>
                                 </button>
                             <?php endfor;
@@ -168,35 +187,12 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php endif; ?>
                     </div>
                     
-                    <button class="page-nav-arrow" id="next-btn" onclick="navigatePage(1)" aria-label="Next page">
+                    <button class="page-nav-arrow" id="next-btn-bottom" onclick="navigatePage(1)" aria-label="Next page">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
                     </button>
                 </nav>
-                <?php endif; ?>
-                
-                <article id="photobook-content" class="book-content" role="main" aria-live="polite">
-                    <!-- Story pages will be loaded here -->
-                </article>
-                
-                <?php if ($totalPages > 1): ?>
-                <div class="photobook-controls bottom-controls">
-                    <button class="nav-button" onclick="navigatePage(-1)" aria-label="Previous page">
-                        <span class="arrow">←</span> Previous
-                    </button>
-                    <div class="page-dots">
-                        <?php for($i = 1; $i <= min($totalPages, 10); $i++): ?>
-                        <span class="page-dot" data-page="<?= $i ?>" onclick="goToPage(<?= $i ?>)"></span>
-                        <?php endfor; ?>
-                        <?php if ($totalPages > 10): ?>
-                        <span class="page-more">...</span>
-                        <?php endif; ?>
-                    </div>
-                    <button class="nav-button" onclick="navigatePage(1)" aria-label="Next page">
-                        Next <span class="arrow">→</span>
-                    </button>
-                </div>
                 <?php endif; ?>
             </article>
             

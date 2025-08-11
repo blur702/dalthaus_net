@@ -446,21 +446,7 @@ img.article-thumbnail {
     line-height: 1.2;
 }
 
-.photobook-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 2rem;
-}
-
-.photobook-controls.bottom-controls {
-    border-bottom: none;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 2rem;
-    padding-top: 1rem;
-}
+/* Photobook controls now use the same navigation styles as articles */
 
 .book-content {
     padding: 0;
@@ -515,15 +501,58 @@ img.article-thumbnail {
     width: calc(100% + 6rem);
 }
 
-/* Elegant Page Navigation */
+/* Elegant Top Dropdown Navigation */
+.article-top-nav {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.page-selector-elegant {
+    padding: 0.5rem 1rem;
+    font-family: 'Arimo', sans-serif;
+    font-size: 0.95rem;
+    color: #666;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+    text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.page-selector-elegant:hover {
+    background-color: #f5f5f5;
+    border-color: #e0e0e0;
+}
+
+.page-selector-elegant:focus {
+    outline: none;
+    border-color: #5a6c7d;
+    background-color: #f5f5f5;
+}
+
+/* Bottom Page Navigation */
 .page-navigation {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
     padding: 1.5rem 0;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 2rem;
+}
+
+.page-navigation.bottom-nav {
+    border-top: 1px solid #e0e0e0;
+    margin-top: 2rem;
 }
 
 .page-nav-arrow {
