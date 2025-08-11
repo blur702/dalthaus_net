@@ -167,6 +167,13 @@ h1, h2, h3, h4, h5, h6 {
     padding: 2rem 20px;
 }
 
+/* Container for consistent width across all pages */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
 .content-layout {
     display: grid;
     grid-template-columns: 66fr 34fr; /* 66% / 34% layout as specified */
@@ -364,14 +371,11 @@ img.article-thumbnail {
 
 /* Article Page */
 .article-content {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
 }
 
-/* Photobook specific container override */
-.photobook-page .article-content {
-    max-width: 1200px;
-}
+/* Articles and photobooks use full container width */
 
 .article-header {
     margin-bottom: 2rem;
