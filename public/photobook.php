@@ -125,10 +125,16 @@ require_once __DIR__ . '/../includes/header.php';
     
     <main id="main" class="site-main">
         <div class="container">
-            <div class="photobook-viewer">
-                <div class="book-header">
+            <article class="photobook-viewer">
+                <header class="book-header">
                     <h1 class="book-title"><?= htmlspecialchars($photobook['title']) ?></h1>
-                </div>
+                    <div class="article-meta">
+                        Published on <?= date('F j, Y', strtotime($photobook['published_date'] ?? $photobook['created_at'])) ?>
+                        <?php if ($photobook['updated_at'] > $photobook['created_at']): ?>
+                        • Updated <?= date('F j, Y', strtotime($photobook['updated_at'])) ?>
+                        <?php endif; ?>
+                    </div>
+                </header>
                 
                 <?php if ($totalPages > 1): ?>
                 <div class="photobook-controls">
@@ -179,7 +185,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </button>
                 </div>
                 <?php endif; ?>
-            </div>
+            </article>
             
             <nav class="article-nav">
                 <a href="/photobooks" class="back-link">← Back to Photo Books</a>
