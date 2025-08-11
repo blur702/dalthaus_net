@@ -257,14 +257,7 @@ $csrf = generateCSRFToken();
                 p:first-of-type {
                     text-indent: 0;
                 }
-                p:first-of-type:first-letter {
-                    font-size: 3.5rem;
-                    float: left;
-                    line-height: 1;
-                    margin: 0 0.1em 0 0;
-                    font-weight: 600;
-                    color: #667eea;
-                }
+                /* Drop caps removed - no longer using first-letter styling */
                 img { 
                     max-width: 100%; 
                     height: auto; 
