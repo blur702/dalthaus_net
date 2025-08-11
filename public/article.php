@@ -72,31 +72,6 @@ $additionalStyles = '
         transition: opacity 0.3s ease;
     }
     
-    .page-selector {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.95rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background: white;
-        color: #333;
-        cursor: pointer;
-        max-width: 300px;
-        margin: 0 0.5rem;
-    }
-    
-    .page-selector:hover {
-        border-color: #3498db;
-    }
-    
-    .page-selector:focus {
-        outline: 2px solid #3498db;
-        outline-offset: 2px;
-    }
-    
-    .page-count {
-        font-size: 0.95rem;
-        color: #666;
-    }
     
     .article-controls {
         display: flex;
@@ -192,30 +167,44 @@ require_once __DIR__ . '/../includes/header.php';
                 </header>
                 
                 <?php if ($totalPages > 1): ?>
-                <div class="article-controls">
-                    <button class="nav-button" id="prev-btn" onclick="navigatePage(-1)" aria-label="Previous page">
-                        <span class="arrow">←</span> Previous
+                <nav class="page-navigation" aria-label="Page navigation">
+                    <button class="page-nav-arrow" id="prev-btn" onclick="navigatePage(-1)" aria-label="Previous page" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
                     </button>
-                    <div class="page-indicator">
-                        <select id="page-selector" onchange="goToPage(this.value)" class="page-selector">
-                            <?php if ($pageInfo && isset($pageInfo['pages'])): ?>
-                                <?php foreach ($pageInfo['pages'] as $page): ?>
-                                    <option value="<?= $page['page'] ?>">
-                                        <?= $page['page'] ?>. <?= htmlspecialchars($page['title']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                    <option value="<?= $i ?>">Page <?= $i ?></option>
-                                <?php endfor; ?>
-                            <?php endif; ?>
-                        </select>
-                        <span class="page-count">of <?= $totalPages ?></span>
+                    
+                    <div class="page-numbers">
+                        <?php 
+                        $maxVisible = 7;
+                        $current = 1;
+                        
+                        if ($totalPages <= $maxVisible): 
+                            for($i = 1; $i <= $totalPages; $i++): ?>
+                                <button class="page-number <?= $i === 1 ? 'active' : '' ?>" 
+                                        onclick="goToPage(<?= $i ?>)" 
+                                        data-page="<?= $i ?>"
+                                        <?php if ($pageInfo && isset($pageInfo['pages'][$i-1])): ?>
+                                        title="<?= htmlspecialchars($pageInfo['pages'][$i-1]['title']) ?>"
+                                        <?php endif; ?>>
+                                    <?= $i ?>
+                                </button>
+                            <?php endfor;
+                        else: ?>
+                            <button class="page-number active" onclick="goToPage(1)" data-page="1">1</button>
+                            <button class="page-number" onclick="goToPage(2)" data-page="2">2</button>
+                            <button class="page-number" onclick="goToPage(3)" data-page="3">3</button>
+                            <span class="page-ellipsis">...</span>
+                            <button class="page-number" onclick="goToPage(<?= $totalPages ?>)" data-page="<?= $totalPages ?>"><?= $totalPages ?></button>
+                        <?php endif; ?>
                     </div>
-                    <button class="nav-button" id="next-btn" onclick="navigatePage(1)" aria-label="Next page">
-                        Next <span class="arrow">→</span>
+                    
+                    <button class="page-nav-arrow" id="next-btn" onclick="navigatePage(1)" aria-label="Next page">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
                     </button>
-                </div>
+                </nav>
                 <?php endif; ?>
                 
                 <div id="article-content" class="article-body article-content">
@@ -323,7 +312,6 @@ $additionalScripts = '
     
     function loadPage(pageNum) {
         const content = document.getElementById("article-content");
-        const pageSelector = document.getElementById("page-selector");
         
         // Fade out current content
         content.style.opacity = "0";
@@ -332,13 +320,8 @@ $additionalScripts = '
             // Update content
             content.innerHTML = pages[pageNum - 1] || "";
             
-            // Update page selector
-            if (pageSelector) {
-                pageSelector.value = pageNum;
-            }
-            
-            // Update navigation buttons
-            updateNavButtons();
+            // Update navigation
+            updatePageNavigation();
             
             // Update page dots
             updatePageDots();
@@ -348,15 +331,67 @@ $additionalScripts = '
         }, 200);
     }
     
-    function updateNavButtons() {
-        const prevButtons = document.querySelectorAll(".nav-button");
-        prevButtons.forEach(button => {
-            if (button.textContent.includes("Previous")) {
-                button.disabled = currentPage === 1;
-            } else if (button.textContent.includes("Next")) {
-                button.disabled = currentPage === totalPages;
+    function updatePageNavigation() {
+        // Update arrow buttons
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+        
+        // Update page numbers
+        const pageNumbers = document.querySelectorAll(".page-number");
+        pageNumbers.forEach(btn => {
+            const pageNum = parseInt(btn.dataset.page);
+            if (pageNum === currentPage) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
             }
         });
+        
+        // Update dynamic page numbers if many pages
+        if (totalPages > 7) {
+            updateDynamicPageNumbers();
+        }
+    }
+    
+    function updateDynamicPageNumbers() {
+        const container = document.querySelector(".page-numbers");
+        if (!container) return;
+        
+        let html = "";
+        
+        if (currentPage <= 4) {
+            // Show first 5 pages + last
+            for (let i = 1; i <= Math.min(5, totalPages - 1); i++) {
+                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
+                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+            }
+            if (totalPages > 6) html += '<span class="page-ellipsis">...</span>';
+            html += `<button class="page-number ${currentPage === totalPages ? 'active' : ''}" 
+                     onclick="goToPage(${totalPages})" data-page="${totalPages}">${totalPages}</button>`;
+        } else if (currentPage >= totalPages - 3) {
+            // Show first + last 5 pages
+            html += '<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>';
+            html += '<span class="page-ellipsis">...</span>';
+            for (let i = totalPages - 4; i <= totalPages; i++) {
+                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
+                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+            }
+        } else {
+            // Show first + current-1, current, current+1 + last
+            html += '<button class="page-number" onclick="goToPage(1)" data-page="1">1</button>';
+            html += '<span class="page-ellipsis">...</span>';
+            for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                html += `<button class="page-number ${i === currentPage ? 'active' : ''}" 
+                         onclick="goToPage(${i})" data-page="${i}">${i}</button>`;
+            }
+            html += '<span class="page-ellipsis">...</span>';
+            html += `<button class="page-number" onclick="goToPage(${totalPages})" 
+                     data-page="${totalPages}">${totalPages}</button>`;
+        }
+        
+        container.innerHTML = html;
     }
     
     function updatePageDots() {
