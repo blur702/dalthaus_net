@@ -332,7 +332,7 @@ img.article-thumbnail {
 }
 
 .photobook-title a:hover {
-    color: #8e44ad;
+    color: #3498db;
 }
 
 .photobook-preview {
@@ -344,7 +344,7 @@ img.article-thumbnail {
 }
 
 .view-book {
-    color: #8e44ad;
+    color: #3498db;
     text-decoration: none;
     font-weight: 500;
     font-family: 'Arimo', sans-serif;
@@ -410,7 +410,7 @@ img.article-thumbnail {
 }
 
 .book-header {
-    background: linear-gradient(135deg, #8e44ad 0%, #667eea 100%);
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     color: white;
     padding: 2.5rem 2rem;
     text-align: center;
@@ -517,7 +517,7 @@ img.article-thumbnail {
 }
 
 .page-dot.active {
-    background: #8e44ad;
+    background: #3498db;
     transform: scale(1.3);
 }
 
@@ -528,7 +528,7 @@ img.article-thumbnail {
 
 .nav-button {
     padding: 0.6rem 1.2rem;
-    background: #8e44ad;
+    background: #3498db;
     color: white;
     border: none;
     border-radius: 5px;
@@ -540,7 +540,7 @@ img.article-thumbnail {
 }
 
 .nav-button:hover:not(:disabled) {
-    background: #764ba2;
+    background: #2980b9;
     transform: translateY(-1px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.15);
 }
@@ -625,7 +625,7 @@ img.article-thumbnail {
 }
 
 .photobook-list-title a:hover {
-    color: #8e44ad;
+    color: #3498db;
 }
 
 
@@ -759,7 +759,7 @@ img.article-thumbnail {
     position: absolute;
     top: -40px;
     left: 0;
-    background: #667eea;
+    background: #3498db;
     color: white;
     padding: 8px;
     text-decoration: none;
@@ -772,7 +772,7 @@ img.article-thumbnail {
 
 /* Focus Styles */
 :focus {
-    outline: 2px solid #667eea;
+    outline: 2px solid #3498db;
     outline-offset: 2px;
 }
 
@@ -782,7 +782,7 @@ img.article-thumbnail {
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border-top: 3px solid #3498db;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
