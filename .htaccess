@@ -1,0 +1,96 @@
+# MAMP Pro Compatible .htaccess
+
+# Set default directory index
+DirectoryIndex index.php index.html
+
+# Custom error pages
+ErrorDocument 400 /error.php?code=400
+ErrorDocument 401 /error.php?code=401
+ErrorDocument 403 /error.php?code=403
+ErrorDocument 404 /error.php?code=404
+ErrorDocument 500 /error.php?code=500
+ErrorDocument 503 /error.php?code=503
+
+# Enable RewriteEngine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Force HTTPS in production (uncomment for production)
+    # RewriteCond %{HTTPS} off
+    # RewriteCond %{HTTP_HOST} !^localhost
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+    
+    # Set RewriteBase - adjust if site is in a subdirectory
+    # If your site is at http://localhost/dalthaus_net/ use: RewriteBase /dalthaus_net/
+    # If your site is at http://localhost/ use: RewriteBase /
+    RewriteBase /
+    
+    # Block access to sensitive directories
+    RewriteRule ^(includes|logs|cache|temp|tests)/.*$ - [F,L]
+    RewriteRule ^\.htaccess$ - [F,L]
+    RewriteRule ^.*\.log$ - [F,L]
+    
+    # Handle clean URLs
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?route=$1 [QSA,L]
+</IfModule>
+
+# PHP Settings for MAMP
+<IfModule mod_php7.c>
+    php_value error_reporting 32767
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/php_errors.log
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+    php_value post_max_size 10M
+    php_value upload_max_filesize 10M
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value error_reporting 32767
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/php_errors.log
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+    php_value post_max_size 10M
+    php_value upload_max_filesize 10M
+</IfModule>
+
+# Security headers (if mod_headers is enabled)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Cache static assets
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|woff2|woff|ttf)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+</IfModule>
+
+# Compress output (if mod_deflate is enabled)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Deny access to files without a dot
+<FilesMatch "^[^.]+$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Allow access to index.php
+<Files "index.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+# Protect uploads directory
+<IfModule mod_rewrite.c>
+    RewriteRule ^uploads/.*\.php$ - [F,L]
+</IfModule>

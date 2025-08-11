@@ -1,0 +1,6 @@
+[Sun Aug 10 21:56:23 2025] PHP 8.4.11 Development Server (http://localhost:8000) started
+[Sun Aug 10 21:56:31 2025] [::1]:54471 Accepted
+[Sun Aug 10 21:56:31 2025] [::1]:54471 Closing
+[Sun Aug 10 21:56:50 2025] [::1]:54496 Accepted
+[Sun Aug 10 21:56:50 2025] [::1]:54496 [200]: GET /admin/login.php
+[Sun Aug 10 21:56:50 2025] [::1]:54496 Closing

@@ -1,0 +1,44 @@
+# Apache virtual host configuration example for Dalthaus CMS
+
+<VirtualHost *:80>
+    ServerName dalthaus.net
+    ServerAlias www.dalthaus.net
+    DocumentRoot /var/www/dalthaus_net
+    
+    # Set default directory index
+    DirectoryIndex index.php index.html
+    
+    <Directory /var/www/dalthaus_net>
+        # Allow .htaccess overrides
+        AllowOverride All
+        
+        # Require all granted for Apache 2.4+
+        Require all granted
+        
+        # Enable mod_rewrite
+        RewriteEngine On
+        
+        # PHP settings (if using mod_php)
+        php_value upload_max_filesize 10M
+        php_value post_max_size 10M
+        php_value max_execution_time 300
+        php_value max_input_time 300
+    </Directory>
+    
+    # Deny access to sensitive directories
+    <DirectoryMatch "^/var/www/dalthaus_net/(includes|logs|cache|temp|tests)/">
+        Require all denied
+    </DirectoryMatch>
+    
+    # Prevent PHP execution in uploads
+    <Directory /var/www/dalthaus_net/uploads>
+        php_admin_value engine Off
+        <FilesMatch "\.php$">
+            Require all denied
+        </FilesMatch>
+    </Directory>
+    
+    # Logging
+    ErrorLog ${APACHE_LOG_DIR}/dalthaus_error.log
+    CustomLog ${APACHE_LOG_DIR}/dalthaus_access.log combined
+</VirtualHost>

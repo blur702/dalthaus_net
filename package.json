@@ -1,0 +1,19 @@
+{
+  "name": "dalthaus_net",
+  "version": "1.0.0",
+  "description": "A custom PHP content management system with document import, versioning, autosave, and drag-drop sorting capabilities.",
+  "main": "test_browser.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.54.2"
+  }
+}

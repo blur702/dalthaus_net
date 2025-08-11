@@ -1,0 +1,57 @@
+# Nginx configuration example for Dalthaus CMS
+
+server {
+    listen 80;
+    server_name dalthaus.net www.dalthaus.net;
+    root /var/www/dalthaus_net;
+    index index.php index.html;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Deny access to sensitive directories
+    location ~ ^/(includes|logs|cache|temp|tests)/ {
+        deny all;
+        return 404;
+    }
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+        return 404;
+    }
+
+    # Static files
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|woff|woff2|ttf|svg|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Main application
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP processing
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Uploads directory with controlled access
+    location /uploads {
+        # Allow serving files but prevent PHP execution
+        location ~ \.php$ {
+            deny all;
+        }
+    }
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css text/javascript application/javascript application/json;
+    gzip_min_length 1000;
+}
