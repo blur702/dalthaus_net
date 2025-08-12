@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
         $error = 'Invalid request';
     } elseif (Auth::login($_POST['username'] ?? '', $_POST['password'] ?? '')) {
-        header('Location: /admin');
+        header('Location: /admin/dashboard.php');
         exit;
     } else {
         $error = 'Invalid credentials';

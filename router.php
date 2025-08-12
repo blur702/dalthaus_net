@@ -44,6 +44,16 @@ if (preg_match('/\.php$/', $uri) && file_exists(__DIR__ . $uri)) {
 }
 
 /**
+ * Admin Root Redirect
+ * 
+ * Redirect /admin to /admin/dashboard.php
+ */
+if ($uri === '/admin' || $uri === '/admin/') {
+    header('Location: /admin/dashboard.php');
+    exit;
+}
+
+/**
  * Public Page Routing
  * 
  * Routes clean URLs to public PHP controllers.
