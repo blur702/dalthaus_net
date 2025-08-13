@@ -259,8 +259,22 @@ function processContentImages(string $content): string {
  * @return void
  */
 function showError(int $code = 404, string $message = ''): void {
-    // Redirect to error page with code
-    header("Location: /error.php?code=$code");
+    // Set proper HTTP status code
+    http_response_code($code);
+    
+    // Include error page if it exists, otherwise show simple error
+    $errorPage = __DIR__ . '/../public/error.php';
+    if (file_exists($errorPage)) {
+        $_GET['code'] = $code;
+        $_GET['message'] = $message;
+        include $errorPage;
+    } else {
+        // Simple error page
+        echo "<!DOCTYPE html><html><head><title>Error $code</title></head>";
+        echo "<body><h1>Error $code</h1>";
+        echo $message ? "<p>$message</p>" : "<p>The requested page could not be found.</p>";
+        echo "<p><a href='/'>Return to homepage</a></p></body></html>";
+    }
     exit;
 }
 

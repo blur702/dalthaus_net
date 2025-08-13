@@ -7,6 +7,8 @@ require_once __DIR__ . '/../includes/functions.php';
 
 Auth::requireAdmin();
 
+$pageTitle = 'Dashboard';
+
 // Check if password needs rotation
 $needsPasswordChange = false;
 if ($_SESSION['username'] === DEFAULT_ADMIN_USER) {
@@ -34,30 +36,10 @@ $stats = [
 ];
 
 $csrf = generateCSRFToken();
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
-</head>
-<body>
-    <div class="admin-wrapper">
-        <nav class="admin-nav">
-            <h1>CMS Admin</h1>
-            <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/articles">Articles</a></li>
-                <li><a href="/admin/photobooks">Photobooks</a></li>
-                <li><a href="/admin/menus">Menus</a></li>
-                <li><a href="/admin/sort">Sort Content</a></li>
-                <li><a href="/admin/upload">Upload Files</a></li>
-                <li><a href="/admin/import">Import Documents</a></li>
-                <li><a href="/admin/logout">Logout</a></li>
-            </ul>
-        </nav>
         
         <main class="admin-content">
             <h2>Dashboard</h2>
@@ -85,20 +67,18 @@ $csrf = generateCSRFToken();
                 <div class="stat-card">
                     <h3>Articles</h3>
                     <p class="stat-number"><?= $stats['articles'] ?></p>
-                    <a href="/admin/articles">Manage Articles</a>
+                    <a href="/admin/articles.php">Manage Articles</a>
                 </div>
                 <div class="stat-card">
                     <h3>Photobooks</h3>
                     <p class="stat-number"><?= $stats['photobooks'] ?></p>
-                    <a href="/admin/photobooks">Manage Photobooks</a>
+                    <a href="/admin/photobooks.php">Manage Photobooks</a>
                 </div>
                 <div class="stat-card">
                     <h3>Versions</h3>
                     <p class="stat-number"><?= $stats['versions'] ?></p>
-                    <a href="/admin/versions">View History</a>
+                    <a href="/admin/versions.php">View History</a>
                 </div>
             </div>
         </main>
-    </div>
-</body>
-</html>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

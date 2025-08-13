@@ -84,7 +84,7 @@ class Auth {
     public static function requireAdmin(): void {
         session_start();
         if (!self::isLoggedIn() || $_SESSION['role'] !== 'admin') {
-            header('Location: /admin/login');
+            header('Location: /admin/login.php');
             exit;
         }
     }

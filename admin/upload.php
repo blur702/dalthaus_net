@@ -7,6 +7,8 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/upload.php';
 
 Auth::requireAdmin();
+
+$pageTitle = 'Upload Files';
 $pdo = Database::getInstance();
 $message = '';
 $error = '';
@@ -63,30 +65,10 @@ $content = $pdo->query("
 ")->fetchAll();
 
 $csrf = generateCSRFToken();
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Files</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
-</head>
-<body>
-    <div class="admin-wrapper">
-        <nav class="admin-nav">
-            <h1>CMS Admin</h1>
-            <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/articles">Articles</a></li>
-                <li><a href="/admin/photobooks">Photobooks</a></li>
-                <li><a href="/admin/menus">Menus</a></li>
-                <li><a href="/admin/sort">Sort Content</a></li>
-                <li class="active"><a href="/admin/upload">Upload Files</a></li>
-                <li><a href="/admin/import">Import Documents</a></li>
-                <li><a href="/admin/logout">Logout</a></li>
-            </ul>
-        </nav>
         
         <main class="admin-content">
             <h2>Upload Files</h2>
@@ -160,7 +142,6 @@ $csrf = generateCSRFToken();
                 </tbody>
             </table>
         </main>
-    </div>
     
     <script>
         function copyLink(link) {
@@ -170,5 +151,4 @@ $csrf = generateCSRFToken();
             });
         }
     </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

@@ -1,28 +1,42 @@
 <?php
 declare(strict_types=1);
-session_start();
 require_once '../includes/auth.php';
 require_once '../includes/database.php';
 require_once '../includes/functions.php';
 
 Auth::requireAdmin();
+
+$pageTitle = 'Version History';
 $pdo = Database::getInstance();
 
 $contentId = (int)($_GET['content_id'] ?? 0);
 
+// If no content_id, show list of all content with versions
 if (!$contentId) {
-    header('Location: /admin/dashboard');
-    exit;
-}
-
-// Get content details
-$stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
-$stmt->execute([$contentId]);
-$content = $stmt->fetch();
-
-if (!$content) {
-    header('Location: /admin/dashboard');
-    exit;
+    // Get all content with version counts
+    $allContent = $pdo->query("
+        SELECT c.*, COUNT(cv.id) as version_count, MAX(cv.created_at) as last_version_date
+        FROM content c
+        LEFT JOIN content_versions cv ON c.id = cv.content_id
+        WHERE c.deleted_at IS NULL
+        GROUP BY c.id
+        HAVING version_count > 0
+        ORDER BY last_version_date DESC
+    ")->fetchAll();
+    
+    $pageTitle = 'All Version History';
+    $showList = true;
+} else {
+    // Get specific content details
+    $stmt = $pdo->prepare("SELECT * FROM content WHERE id = ?");
+    $stmt->execute([$contentId]);
+    $content = $stmt->fetch();
+    
+    if (!$content) {
+        header('Location: /admin/dashboard.php');
+        exit;
+    }
+    $showList = false;
 }
 
 // Handle version restoration
@@ -60,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_version'])) {
                 cacheClear();
                 
                 $_SESSION['success'] = 'Version restored successfully';
-                header("Location: /admin/versions?content_id=$contentId");
+                header("Location: /admin/versions.php?content_id=$contentId");
                 exit;
             } catch (Exception $e) {
                 $pdo->rollBack();
@@ -83,33 +97,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_version'])) {
         $stmt->execute([$versionId, $contentId]);
         
         $_SESSION['success'] = 'Autosave deleted';
-        header("Location: /admin/versions?content_id=$contentId");
+        header("Location: /admin/versions.php?content_id=$contentId");
         exit;
     }
 }
 
-// Get all versions
-$stmt = $pdo->prepare("
-    SELECT * FROM content_versions 
-    WHERE content_id = ? 
-    ORDER BY created_at DESC
-");
-$stmt->execute([$contentId]);
-$versions = $stmt->fetchAll();
+// Get all versions if viewing specific content
+if (!$showList) {
+    $stmt = $pdo->prepare("
+        SELECT * FROM content_versions 
+        WHERE content_id = ? 
+        ORDER BY created_at DESC
+    ");
+    $stmt->execute([$contentId]);
+    $versions = $stmt->fetchAll();
+    
+    $pageTitle = 'Version History: ' . $content['title'];
+}
 
-$pageTitle = 'Version History: ' . $content['title'];
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
+$extraStyles = '
     <style>
         .version-container {
             max-width: 1200px;
             margin: 2rem auto;
+        }
+        .version-list {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 1rem;
+        }
+        .version-list th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .version-list td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .version-list tr:hover {
+            background: #f8f9fa;
         }
         .content-info {
             background: #f8f9fa;
@@ -266,28 +295,51 @@ $pageTitle = 'Version History: ' . $content['title'];
         .back-link:hover {
             text-decoration: underline;
         }
-    </style>
-</head>
-<body>
-    <header class="admin-header">
-        <h1>Admin Panel</h1>
-        <nav>
-            <a href="/admin/dashboard">Dashboard</a>
-            <a href="/admin/articles">Articles</a>
-            <a href="/admin/photobooks">Photobooks</a>
-            <a href="/admin/menus">Menus</a>
-            <a href="/admin/sort">Sort</a>
-            <a href="/admin/import">Import</a>
-            <a href="/admin/upload">Upload</a>
-            <a href="/admin/logout">Logout</a>
-        </nav>
-    </header>
+    </style>';
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
+?>
 
     <main class="admin-content">
         <div class="version-container">
-            <a href="/admin/<?= $content['type'] ?>s" class="back-link">← Back to <?= ucfirst($content['type']) ?>s</a>
-            
-            <h2>Version History</h2>
+            <?php if ($showList): ?>
+                <h2>All Version History</h2>
+                
+                <?php if (empty($allContent)): ?>
+                    <p>No content with versions found.</p>
+                <?php else: ?>
+                    <table class="version-list">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Versions</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($allContent as $item): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($item['title']) ?></td>
+                                    <td><?= ucfirst($item['type']) ?></td>
+                                    <td><?= ucfirst($item['status']) ?></td>
+                                    <td><?= $item['version_count'] ?></td>
+                                    <td><?= date('M d, Y', strtotime($item['updated_at'])) ?></td>
+                                    <td>
+                                        <a href="/admin/versions.php?content_id=<?= $item['id'] ?>" class="btn btn-sm">View Versions</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            <?php else: ?>
+                <a href="/admin/<?= $content['type'] ?>s.php" class="back-link">← Back to <?= ucfirst($content['type']) ?>s</a>
+                
+                <h2>Version History</h2>
             
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert alert-success">
@@ -367,6 +419,7 @@ $pageTitle = 'Version History: ' . $content['title'];
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+            <?php endif; ?>
         </div>
     </main>
 
@@ -378,5 +431,4 @@ $pageTitle = 'Version History: ' . $content['title'];
             }
         }
     </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

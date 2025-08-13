@@ -6,6 +6,8 @@ require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 Auth::requireAdmin();
+
+$pageTitle = 'Menus';
 $pdo = Database::getInstance();
 $message = '';
 
@@ -83,31 +85,12 @@ $bottomMenu = $pdo->query("
 ")->fetchAll();
 
 $csrf = generateCSRFToken();
+
+$extraStyles = '<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>';
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Menus</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-</head>
-<body>
-    <div class="admin-wrapper">
-        <nav class="admin-nav">
-            <h1>CMS Admin</h1>
-            <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/articles">Articles</a></li>
-                <li><a href="/admin/photobooks">Photobooks</a></li>
-                <li class="active"><a href="/admin/menus">Menus</a></li>
-                <li><a href="/admin/sort">Sort Content</a></li>
-                <li><a href="/admin/upload">Upload Files</a></li>
-                <li><a href="/admin/import">Import Documents</a></li>
-                <li><a href="/admin/logout">Logout</a></li>
-            </ul>
-        </nav>
         
         <main class="admin-content">
             <h2>Manage Menus</h2>
@@ -208,8 +191,8 @@ $csrf = generateCSRFToken();
                 </ul>
             </div>
         </main>
-    </div>
     
-    <script src="/assets/js/sorting.js"></script>
-</body>
-</html>
+<?php
+$extraScripts = '<script src="/assets/js/sorting.js"></script>';
+require_once __DIR__ . '/templates/footer.php';
+?>

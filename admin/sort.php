@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
-session_start();
 require_once '../includes/auth.php';
 require_once '../includes/database.php';
 require_once '../includes/functions.php';
 
 Auth::requireAdmin();
+
+$pageTitle = 'Sort Content';
 $pdo = Database::getInstance();
 
 // Handle AJAX sort update
@@ -63,14 +64,7 @@ $stmt->execute([$contentType]);
 $items = $stmt->fetchAll();
 
 $pageTitle = ucfirst($contentType) . ' Ordering';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
+$extraStyles = '
     <style>
         .sort-container {
             max-width: 800px;
@@ -167,21 +161,11 @@ $pageTitle = ucfirst($contentType) . ' Ordering';
             margin-bottom: 1.5rem;
         }
     </style>
-</head>
-<body>
-    <header class="admin-header">
-        <h1>Admin Panel</h1>
-        <nav>
-            <a href="/admin/dashboard">Dashboard</a>
-            <a href="/admin/articles">Articles</a>
-            <a href="/admin/photobooks">Photobooks</a>
-            <a href="/admin/menus">Menus</a>
-            <a href="/admin/sort" class="active">Sort</a>
-            <a href="/admin/import">Import</a>
-            <a href="/admin/upload">Upload</a>
-            <a href="/admin/logout">Logout</a>
-        </nav>
-    </header>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>';
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
+?>
 
     <main class="admin-content">
         <div class="sort-container">
@@ -272,5 +256,4 @@ $pageTitle = ucfirst($contentType) . ' Ordering';
             });
         }
     </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

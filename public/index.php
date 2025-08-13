@@ -3,8 +3,68 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/auth.php';
 
 $pdo = Database::getInstance();
+
+// Check maintenance mode
+$settings = [];
+$result = $pdo->query("SELECT setting_key, setting_value FROM site_settings");
+foreach ($result as $row) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
+
+// If maintenance mode is enabled and user is not admin, show maintenance page
+if (!empty($settings['maintenance_mode']) && $settings['maintenance_mode'] === '1') {
+    if (!Auth::isLoggedIn()) {
+        $maintenanceMessage = $settings['maintenance_message'] ?? 'We are currently performing maintenance. Please check back soon.';
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Maintenance - <?= htmlspecialchars($settings['site_title'] ?? 'Dalthaus.net') ?></title>
+            <style>
+                body {
+                    font-family: 'Gelasio', serif;
+                    background: #f8f9fa;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .maintenance-box {
+                    background: white;
+                    border-radius: 8px;
+                    padding: 40px;
+                    max-width: 500px;
+                    text-align: center;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                }
+                h1 {
+                    color: #2c3e50;
+                    margin-bottom: 20px;
+                }
+                p {
+                    color: #6c757d;
+                    line-height: 1.6;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="maintenance-box">
+                <h1>Under Maintenance</h1>
+                <p><?= nl2br(htmlspecialchars($maintenanceMessage)) ?></p>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+}
 
 // Get cached version if available
 $cacheKey = 'homepage';

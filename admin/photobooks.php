@@ -6,6 +6,8 @@ require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 Auth::requireAdmin();
+
+$pageTitle = 'Photobooks';
 $pdo = Database::getInstance();
 $message = '';
 $error = '';
@@ -99,31 +101,12 @@ if (isset($_GET['edit'])) {
 }
 
 $csrf = generateCSRFToken();
+
+$extraStyles = '<script src="/assets/vendor/tinymce.min.js"></script>';
+
+require_once __DIR__ . '/templates/header.php';
+require_once __DIR__ . '/templates/nav.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Photobooks</title>
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
-</head>
-<body>
-    <div class="admin-wrapper">
-        <nav class="admin-nav">
-            <h1>CMS Admin</h1>
-            <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/articles">Articles</a></li>
-                <li class="active"><a href="/admin/photobooks">Photobooks</a></li>
-                <li><a href="/admin/menus">Menus</a></li>
-                <li><a href="/admin/sort">Sort Content</a></li>
-                <li><a href="/admin/upload">Upload Files</a></li>
-                <li><a href="/admin/import">Import Documents</a></li>
-                <li><a href="/admin/logout">Logout</a></li>
-            </ul>
-        </nav>
         
         <main class="admin-content">
             <div class="page-header">
@@ -156,13 +139,21 @@ $csrf = generateCSRFToken();
                     </div>
                     
                     <div class="form-group">
-                        <label for="slug">Slug</label>
-                        <input type="text" id="slug" name="slug" value="<?= $editPhotobook ? htmlspecialchars($editPhotobook['slug']) : '' ?>">
+                        <label for="slug">URL Alias</label>
+                        <input type="text" id="slug" name="slug" placeholder="e.g., my-photobook-title" value="<?= $editPhotobook ? htmlspecialchars($editPhotobook['slug']) : '' ?>">
+                        <small class="form-help">Used in the URL. Leave blank to auto-generate from title.</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="author">Author</label>
                         <input type="text" id="author" name="author" value="<?= $editPhotobook ? htmlspecialchars($editPhotobook['author'] ?? 'Don Althaus') : 'Don Althaus' ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="document-upload">Import Document (Optional)</label>
+                        <input type="file" id="document-upload" accept=".docx,.doc,.pdf">
+                        <small class="form-help">Upload a Word document or PDF to convert to HTML content</small>
+                        <div id="upload-status"></div>
                     </div>
                     
                     <div class="form-group">
@@ -181,7 +172,7 @@ $csrf = generateCSRFToken();
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Save</button>
-                        <a href="/admin/photobooks" class="btn btn-secondary">Cancel</a>
+                        <a href="/admin/photobooks.php" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -191,7 +182,7 @@ $csrf = generateCSRFToken();
                     <tr>
                         <th>Order</th>
                         <th>Title</th>
-                        <th>Slug</th>
+                        <th>URL Alias</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th>Actions</th>
@@ -207,7 +198,7 @@ $csrf = generateCSRFToken();
                         <td><?= date('Y-m-d', strtotime($book['created_at'])) ?></td>
                         <td>
                             <a href="?edit=<?= $book['id'] ?>" class="btn btn-sm">Edit</a>
-                            <a href="/admin/versions?content_id=<?= $book['id'] ?>" class="btn btn-sm">Versions</a>
+                            <a href="/admin/versions.php?content_id=<?= $book['id'] ?>" class="btn btn-sm">Versions</a>
                             <form method="post" style="display:inline" onsubmit="return confirm('Move to trash?')">
                                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                 <input type="hidden" name="action" value="delete">
@@ -220,7 +211,6 @@ $csrf = generateCSRFToken();
                 </tbody>
             </table>
         </main>
-    </div>
     
     <script src="/assets/js/autosave.js"></script>
     <script>
@@ -360,13 +350,51 @@ $csrf = generateCSRFToken();
             document.querySelector('[name="action"]').value = 'create';
         }
         
-        // Auto-generate slug
+        // Auto-generate URL alias
         document.getElementById('title')?.addEventListener('blur', function() {
             if (!document.getElementById('slug').value) {
                 const slug = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
                 document.getElementById('slug').value = slug;
             }
         });
+        
+        // Document upload handler
+        document.getElementById('document-upload')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('upload-status');
+            statusDiv.innerHTML = '<div class="alert alert-info">Converting document...</div>';
+            
+            const formData = new FormData();
+            formData.append('document', file);
+            
+            fetch('/admin/api/convert-document.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Insert HTML into TinyMCE
+                    if (tinymce.get('body')) {
+                        tinymce.get('body').setContent(data.html);
+                        statusDiv.innerHTML = '<div class="alert alert-success">Document imported successfully!</div>';
+                    } else {
+                        // Fallback for non-TinyMCE
+                        document.getElementById('body').value = data.html;
+                        statusDiv.innerHTML = '<div class="alert alert-success">Document imported successfully!</div>';
+                    }
+                } else {
+                    statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + (data.error || 'Conversion failed') + '</div>';
+                }
+                // Clear the file input
+                e.target.value = '';
+            })
+            .catch(error => {
+                statusDiv.innerHTML = '<div class="alert alert-error">Error uploading document</div>';
+                console.error('Upload error:', error);
+            });
+        });
     </script>
-</body>
-</html>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

@@ -54,17 +54,17 @@ if (!isset($pageTitle)) {
     <div class="page-wrapper">
         <!-- Header with site title and hamburger menu -->
         <header class="site-header" <?php if (!empty($settings['header_image'])): ?>
-            style="background-image: linear-gradient(<?= $settings['header_overlay_color'] ?? 'rgba(0,0,0,0.3)' ?>, <?= $settings['header_overlay_color'] ?? 'rgba(0,0,0,0.3)' ?>), url('<?= htmlspecialchars($settings['header_image']) ?>'); background-size: cover; background-position: center; height: <?= $settings['header_height'] ?? '200' ?>px;"
+            style="background-image: linear-gradient(<?= $settings['header_overlay_color'] ?? 'rgba(0,0,0,0.3)' ?>, <?= $settings['header_overlay_color'] ?? 'rgba(0,0,0,0.3)' ?>), url('<?= htmlspecialchars($settings['header_image']) ?>'); background-size: cover; background-position: <?= $settings['header_position'] ?? 'center center' ?>; height: <?= $settings['header_height'] ?? '200' ?>px;"
         <?php endif; ?>>
             <div class="header-content">
-                <div class="header-text">
+                <div class="header-text" style="color: <?= $settings['header_text_color'] ?? '#ffffff' ?>;">
                     <h1 class="site-title">
-                        <a href="/" style="color: white; text-decoration: none;">
+                        <a href="/" style="color: <?= $settings['header_text_color'] ?? '#ffffff' ?>; text-decoration: none;">
                             <?= $settings['site_title'] ?? 'Dalthaus.net' ?>
                         </a>
                     </h1>
                     <?php if (!empty($settings['site_motto'])): ?>
-                    <p class="site-motto"><?= $settings['site_motto'] ?></p>
+                    <p class="site-motto" style="color: <?= $settings['header_text_color'] ?? '#ffffff' ?>;"><?= $settings['site_motto'] ?></p>
                     <?php endif; ?>
                 </div>
                 
